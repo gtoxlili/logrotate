@@ -44,10 +44,11 @@ type Writer struct {
 	// Rotation threshold.
 	threshold time.Duration
 	format    string
+	race      *race
 }
 
 // NewWriter creates a new log Writer.
-func NewWriter(unit Unit, dir, prefix string) (*Writer, error) {
+func NewWriter(unit Unit, dir, prefix string, opts ...Option) (*Writer, error) {
 	if err := createDir(dir); err != nil {
 		return nil, err
 	}
@@ -72,11 +73,17 @@ func NewWriter(unit Unit, dir, prefix string) (*Writer, error) {
 		threshold = 100 * 365 * 24 * time.Hour
 	}
 
-	return &Writer{
+	w := &Writer{
 		filePath:  filepath.Join(dir, prefix),
 		threshold: threshold,
 		format:    format,
-	}, nil
+	}
+
+	for _, opt := range opts {
+		opt(w)
+	}
+
+	return w, nil
 }
 
 func (w *Writer) shouldRotate() bool {
@@ -117,6 +124,10 @@ func (w *Writer) rotate() error {
 
 // Write writes the log message to the file.
 func (w *Writer) Write(p []byte) (n int, err error) {
+	if w.race != nil {
+		w.race.mu.Lock()
+		defer w.race.mu.Unlock()
+	}
 	if w.cursor == nil || w.shouldRotate() {
 		if err := w.rotate(); err != nil {
 			return 0, err
