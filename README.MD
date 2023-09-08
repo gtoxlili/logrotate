@@ -1,6 +1,6 @@
 # Logrotate
 
-Logrotate is an open-source library that provides log rotation functionality. It offers high performance by utilizing mmap for log file writing and implements various optimizations for time-based operations. It implements the io.WriteCloser interface, making it easy to integrate with any logging library. It is recommended to use Logrotate with the [Diode](https://github.com/cloudfoundry/go-diodes) library for achieving thread-safe and non-blocking log rotation.
+Logrotate is an Go library that provides log rotation functionality. It offers high performance by utilizing mmap for log file writing and implements various optimizations for time-based operations. It implements the io.WriteCloser interface, making it easy to integrate with any logging library. It is recommended to use Logrotate with the [Diode](https://github.com/cloudfoundry/go-diodes) library for achieving thread-safe and non-blocking log rotation.
 
 
 ## Features
