@@ -67,7 +67,14 @@ func (mw *Writer) Close() error {
 // Write writes data to the mmap.
 func (mw *Writer) Write(p []byte) (int, error) {
 	if len(p) > int(BatchMemSize) {
-		return 0, os.ErrInvalid
+		// 分多次写入
+		for len(p) > int(BatchMemSize) {
+			n, err := mw.Write(p[:BatchMemSize])
+			if err != nil {
+				return 0, err
+			}
+			p = p[n:]
+		}
 	}
 	var n int
 	// Check if expansion is needed.
